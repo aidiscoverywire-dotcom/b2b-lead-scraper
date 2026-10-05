@@ -1,0 +1,64 @@
+LeadScraper v6.2 — Export fix (final) + Max leads 1-1000
+=====================================================
+
+IS RELEASE MEIN KYA HAI
+-----------------------
+1. EXPORT FIX (dohri hifazat):
+   a) Wajah #1 (build): build-windows.bat ab frontend KO HAMESHA dobara
+      banata hai. Pehle agar frontend/dist maujood hota to build usay
+      skip kar deta tha — isi liye v6.1 ka fix aap ke PC tak pahuncha hi
+      nahi tha (purana dist bundle ho gaya tha). Ab ye dobara nahi hoga.
+   b) Wajah #2 (pywebview): official pywebview changelog ke mutabiq
+      version 5.0.1+ mein in-window file downloads DEFAULT OFF hoti hain.
+      Launcher ab `webview.settings['ALLOW_DOWNLOADS'] = True` set karta
+      hai, to browser-style download bhi kaam karegi.
+   c) Export ka naya rasta (pehle se): desktop mode mein Export dabane
+      par file seedha ~/Downloads mein save hoti hai
+      (POST /api/v1/jobs/{id}/export-disk) aur notice mein path nazar
+      aata hai. Agar ye na chale to purana download tareeqa backup hai.
+
+2. VERSION LABEL: App ke topbar mein ab "B2B AI Lead Scraper v6.2.0"
+   likha nazar aayega — is se foran pata chal jayega ke nayi build
+   chal rahi hai ya purani.
+
+3. MAX LEADS: ab dropdown ki jagah number input hai — 1 se 1000 tak
+   koi bhi tadad khud likhein (backend bhi 1000 tak allow karta hai).
+   NOTE: 1000 leads par Google ka kharcha ~$20+ ho sakta hai
+   (500 leads ~$10.86 tha). Pehle chhoti tadad se test karein.
+
+4. Installer ka naam ab Setup_LeadScraper_v6_2.exe hai.
+
+REBUILD KE STEPS (PC par)
+------------------------
+1. Purani app poori tarah BAND karein (Task Manager mein LeadScraper
+   ka koi process na chal raha ho) — warna naya launcher purane server
+   se jur jayega.
+2. Is ZIP ko extract karein.
+3. installer\windows\build-windows.bat chalayein (Step 2 ab frontend
+   hamesha dobara banayega — 1-2 minute lag sakte hain).
+4. installer\windows\setup.iss ko Inno Setup Compiler se compile karein.
+5. Setup_LeadScraper_v6_2.exe install karein.
+6. App khol kar topbar mein "v6.2.0" confirm karein, phir Export dabayein —
+   file Downloads folder mein aani chahiye + path ka notice.
+
+AGAR PHIR BHI EXPORT NA CHALE
+-----------------------------
+- Notice mein kya likha aaya, uska screenshot bhejein.
+- Ya fori jugaad: export_leads_now.py par double-click karein
+  (XLSX seedha Desktop par ban jayegi, app band karne ki zaroorat nahi).
+
+TECHNICAL NOTES (developer ke liye)
+-----------------------------------
+- backend/config.py: APP_VERSION = "6.2.0"
+- GET /api/v1/meta -> {"desktop": bool, "version": "6.2.0"}
+- POST /api/v1/jobs/{job_id}/export-disk?format=csv|xlsx (JWT)
+- frontend/src/api.js: getMeta(), downloadExport() desktop-first
+- frontend/src/App.jsx: topbar version label via /meta
+- frontend/src/pages/Search.jsx: maxLeads number input 1-1000, clamped
+- backend/main.py: JobCreateBody.max_leads le=1000
+- backend/launcher.py: webview.settings['ALLOW_DOWNLOADS'] = True
+- backend/requirements.txt: pywebview>=5.0.1
+- installer/windows/build-windows.bat: unconditional frontend rebuild
+- installer/windows/setup.iss: 1.6.2, Setup_LeadScraper_v6_2
+- Sandbox verified 2026-09-28: frontend build OK, meta endpoint OK,
+  max_leads 1000 accept / 1001 reject OK, export_csv/xlsx OK.
